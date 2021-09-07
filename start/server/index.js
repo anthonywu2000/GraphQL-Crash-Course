@@ -1,57 +1,57 @@
 const { ApolloServer, gql } = require('apollo-server');
+const { mainCards, animals, categories } = require('./db');
 
 // A schema is a collection of type definitions (hence "typeDefs")
 // that together define the "shape" of queries that are executed against
 // your data.
+// ! == means has to be that type
+// Query argument (the slug argument endpoint) => retrieve the individual animal data
 const typeDefs = gql`
-  type Book {
-    title: String
-    author: String
+  type MainCard {
+     title: String!
+     image: String!
   }
   
-  type MainCard {
-     title: String
-     image: String
+  type Animal {
+     id: ID!
+     image: String!
+     title: String!
+     rating: Float
+     price: String!
+     description: [String!]!
+     slug: String!
+     stock: Int!
+     onSale: Boolean
+  }
+  
+  type Category {
+     id: ID!
+     image: String!
+     category: String!
+     slug: String!
   }
   
   type Query {
-    books: [Book]
     mainCards: [MainCard]
+    animals: [Animal!]!
+    animal(slug: String!): Animal
+    categories: [Category!]!
   }
 `;
-
-const books = [
-    {
-        title: 'The Awakening',
-        author: 'Kate Chopin',
-    },
-    {
-        title: 'City of Glass',
-        author: 'Paul Auster',
-    },
-];
-
-const mainCards = [
-    {
-        title: 'Recently Viewed',
-        image: 'lion',
-    },
-    {
-        title: 'Looking for a Gift',
-        image: 'penguin',
-    },
-    {
-        title: 'Best behaved',
-        image: 'cat',
-    }
-];
 
 // Resolvers define the technique for fetching the types defined in the
 // schema. This resolver retrieves books from the "books" array above.
 const resolvers = {
     Query: {
-        books: () => books,
         mainCards: () => mainCards,
+        animals: () => animals,
+        animal: (parent, args, ctx) => {
+            let animal = animals.find((animal) => { // for everything in the animal array, check if the slug is equal to the input args' slug
+                return animal.slug === args.slug
+            })
+            return animal
+        },
+        categories: () => categories,
     },
 };
 
