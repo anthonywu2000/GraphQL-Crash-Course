@@ -2,8 +2,26 @@ import React from 'react'
 import "./MainHero.css"
 import animals from "../../assets/images"
 import {Container} from "reactstrap"
+import { useQuery, gql } from "@apollo/client";
 
 function MainHero() {
+
+    const {loading, error, data} = useQuery(gql`
+         {
+          mainCards {
+               title
+               image
+          }
+         }
+    `);
+
+    if (loading) {
+        return <div>loading....</div>
+    }
+
+    if (error) {
+        return <div>Some error happened. Perhaps 404 not found...</div>
+    }
 
     return (
         <div className="MainHero">
@@ -13,11 +31,11 @@ function MainHero() {
                         <img src={animals.rhino} />
                     </div>
                     <div className="cards-container">
-                        {[].map(card => {
+                        {data.mainCards.map(card => {
                             return (
                                 <div className="card">
                                     <h3>{card.title}</h3>
-                                    <img src={animals[card.img]} style={{width: "100%"}}/>
+                                    <img src={animals[card.image]} style={{width: "100%"}}/>
                                 </div>
                             )
                         })}
